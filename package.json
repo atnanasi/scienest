@@ -1,0 +1,29 @@
+{
+  "name": "scienest",
+  "version": "0.0.0",
+  "description": "Scientia est potentia",
+  "main": "dist/index.js",
+  "repository": "ssh://git@github.com/atnanasi/scienest.git",
+  "author": "Atnanasi <ys2000pro@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel watch -d ./client/dist ./client/index.html & ts-node ./server/index.ts",
+    "build": "parcel build --no-source-map -d ./client/dist ./client/index.html & tsc",
+    "format": "prettier --format \"./src/**/*.ts\""
+  },
+  "dependencies": {
+    "koa": "^2.11.0",
+    "koa-router": "^7.4.0",
+    "preact": "^10.0.4",
+    "preact-router": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.0.51",
+    "@types/koa-router": "^7.0.42",
+    "@types/node": "^12.12.6",
+    "parcel": "^1.12.4",
+    "prettier": "^1.18.2",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.2"
+  }
+}
