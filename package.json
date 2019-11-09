@@ -19,14 +19,18 @@
     "koa": "^2.11.0",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
+    "pg": "^7.12.1",
     "preact": "^10.0.4",
-    "preact-router": "^3.1.0"
+    "preact-router": "^3.1.0",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.20"
   },
   "devDependencies": {
     "@types/koa": "^2.0.51",
     "@types/koa-router": "^7.0.42",
     "@types/koa-static": "^4.0.1",
     "@types/node": "^12.12.6",
+    "@types/pg": "^7.11.2",
     "parcel": "^1.12.4",
     "parcel-bundler": "^1.12.4",
     "prettier": "^1.18.2",
