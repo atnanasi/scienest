@@ -1,0 +1,1 @@
+INSERT INTO "entries" ("path", "body", "is_root") VALUES ('/', 'This is root of entries', 'TRUE');

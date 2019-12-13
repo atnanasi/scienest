@@ -1,0 +1,1 @@
+ALTER TABLE "entries" ADD "scope_private" boolean NOT NULL DEFAULT 'TRUE', ADD "scope_unlisted" boolean NOT NULL DEFAULT 'FALSE';

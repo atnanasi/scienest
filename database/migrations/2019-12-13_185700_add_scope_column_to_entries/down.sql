@@ -1,0 +1,1 @@
+ALTER TABLE "entries" DROP "scope_private", DROP "scope_unlisted";

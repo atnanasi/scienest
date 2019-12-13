@@ -1,0 +1,1 @@
+UPDATE "entries" SET "scope_private" = 'TRUE' WHERE "path" = '/';
