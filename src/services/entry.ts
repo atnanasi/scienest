@@ -18,7 +18,7 @@ export const getEntry = async (path: string): Promise<Entry> => {
       body: entry.shift(),
       updatedAt: entry.shift(),
       createdAt: entry.shift(),
-      isRoot: entry.shift()
+      root: entry.shift()
     }
   }).shift()
 }
@@ -37,7 +37,7 @@ export const getEntries = async (): Promise<Entry[]> => {
       body: entry.shift(),
       updatedAt: entry.shift(),
       createdAt: entry.shift(),
-      isRoot: entry.shift()
+      root: entry.shift()
     }
   })
 }

@@ -3,7 +3,7 @@ export interface Entry {
   body: string,
   updatedAt: Date,
   createdAt: Date,
-  isRoot: boolean,
+  root: boolean,
 }
 
 export interface NewEntry {
