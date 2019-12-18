@@ -60,11 +60,11 @@ const tearDown = async (migrations: Deno.FileInfo[], migrated: QueryResult) => {
 await client.connect()
 
 const tables = await client.query(
-  'SELECT is_insertable_into FROM information_schema.tables WHERE table_name = $1;',
+  'SELECT * FROM information_schema.tables WHERE table_name = $1;',
   MIGRATIONS_TABLE
 )
 
-if(tables.rows.length <= 0) {
+if(tables.rows.length < 1) {
   console.log('Creating migartion management table')
   await client.query(
     `CREATE TABLE ${MIGRATIONS_TABLE} ( migration character varying(255) PRIMARY KEY );`
