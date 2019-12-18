@@ -1,0 +1,1 @@
+INSERT INTO "users" ("id", "admin") VALUES ('rokoucha', 'TRUE');
