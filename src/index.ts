@@ -1,7 +1,7 @@
 import { APP_HOST, APP_PORT } from './config.ts'
 import { Application } from 'https://deno.land/x/oak/mod.ts'
-import { log } from './utils/logger.ts'
 import client from './database.ts'
+import log from './utils/logger.ts'
 import logger from './middleware/logging.ts'
 import router from './router.ts'
 import rt from './middleware/rt.ts'

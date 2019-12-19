@@ -1,5 +1,5 @@
 import { green, bold } from 'https://deno.land/std/fmt/colors.ts'
-import { log } from '../utils/logger.ts'
+import log from '../utils/logger.ts'
 import { Middleware } from 'https://deno.land/x/oak/mod.ts'
 
 const logger: Middleware = async (ctx, next) => {

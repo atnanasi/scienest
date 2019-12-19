@@ -51,4 +51,4 @@ await stdLog.setup({
   }
 });
 
-export const log = stdLog.getLogger();
+export default stdLog.getLogger();
