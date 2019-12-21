@@ -1,23 +1,28 @@
 import { APP_HOST, APP_PORT } from './config.ts'
 import { Application } from 'https://deno.land/x/oak/mod.ts'
+import api from './routers/api.ts'
 import client from './database.ts'
 import log from './utils/logger.ts'
-import logger from './middleware/logging.ts'
-import router from './router.ts'
-import rt from './middleware/rt.ts'
+import requestLogger from './middleware/requestLogger.ts'
+import responseTime from './middleware/responseTime.ts'
+import view from './routers/view.ts'
 
-const app = new Application()
+(async () => {
+  const app = new Application()
 
-app.use(logger);
-app.use(rt);
-app.use(router.routes())
-app.use(router.allowedMethods())
-
-log.info('Connecting to database')
-await client.connect()
-
-log.info(`Listenig on ${APP_HOST}:${APP_PORT}`)
-await app.listen(`${APP_HOST}:${APP_PORT}`)
-
-log.info(`Closing database connection`)
-await client.end()
+  app.use(requestLogger);
+  app.use(responseTime);
+  app.use(api.routes())
+  app.use(api.allowedMethods())
+  app.use(view.routes())
+  app.use(view.allowedMethods())
+  
+  log.info('Connecting to database')
+  await client.connect()
+  
+  log.info(`Listenig on ${APP_HOST}:${APP_PORT}`)
+  await app.listen(`${APP_HOST}:${APP_PORT}`)
+  
+  log.info(`Closing database connection`)
+  await client.end()
+})()
