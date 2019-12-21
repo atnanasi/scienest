@@ -12,6 +12,8 @@ export const getEntry = async (path: string): Promise<Entry> => {
     path
   )
 
+  if(entries.rows.length < 1) throw new Error('Entry not found')
+
   return entries.rows.map((entry): Entry => {
     return {
       path: entry.shift(),
@@ -63,15 +65,13 @@ export const createEntry = async (entry: NewEntry): Promise<Entry> => {
  * @param path entry path
  * @param entry entry
  */
-export const updateEntry = async (path: string, entry: Entry): Promise<Entry> => {
+export const updateEntry = async (path: string, entry: Entry): Promise<void> => {
   await client.query(
     'UPDATE "entries" SET "path" = $1, "body" = $2, "updated_at" = now() WHERE "path" = $3;',
     entry.path,
     entry.body,
     path
   )
-
-  return (await getEntry(entry.path))
 }
 
 /**
