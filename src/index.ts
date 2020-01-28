@@ -6,7 +6,6 @@ import log from './utils/logger.ts'
 import requestLogger from './middleware/requestLogger.ts'
 import responseTime from './middleware/responseTime.ts'
 import view from './routers/view.ts'
-
 ;(async () => {
   const app = new Application()
 
