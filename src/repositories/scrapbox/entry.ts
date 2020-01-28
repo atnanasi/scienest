@@ -1,5 +1,4 @@
-/// <deno-types path="https://deno.land/x/ky/index.d.ts" />
-import ky from 'https://deno.land/x/ky/index.js'
+import { soxa } from 'https://deno.land/x/soxa/mod.ts'
 import EntryRepository, { Entry, NewEntry } from '../entry.ts'
 
 interface Scrapbox {
@@ -70,49 +69,50 @@ interface User {
 }
 
 export default class ScrapboxEntryRepository extends EntryRepository {
-  private api: ky
   private endpoint: URL
   private projectName: string
-  private root: string
+  private rootTitle: string
 
   constructor(
     projectName: string,
-    root = 'Home',
-    endpoint = 'https://scrapbox.io',
+    rootTitle = 'Home',
+    endpoint = 'https://scrapbox.io/',
   ) {
     super()
 
     this.endpoint = new URL(endpoint)
     this.projectName = projectName
-    this.root = root
+    this.rootTitle = rootTitle
+  }
 
-    this.api = ky.create({
-      prefix: `${this.endpoint.href}/api/${this.projectName}`,
-    })
+  private getApi(path: string): string {
+    const absolutePath = path.startsWith('/') ? path : `/${path}`
+    return `${this.endpoint.href}api/pages/${this.projectName}${absolutePath}`
   }
 
   private toPath(title: string): string {
-    return `/${decodeURIComponent(title)}`
+    return title === this.rootTitle ? '/' : `/${decodeURIComponent(title)}`
   }
 
   private toTitle(path: string): string {
-    return encodeURIComponent(path.substring(1))
+    return path === '/' ? this.rootTitle : encodeURIComponent(path.substring(1))
   }
 
   async getEntry(path: string): Promise<Entry> {
-    const entry: Page = await this.api.get(`/${this.toTitle(path)}`).json()
+    const entry: Page = (await soxa.get(this.getApi(`/${this.toTitle(path)}`)))
+      .data
 
     return {
       path: this.toPath(entry.title),
       body: entry.lines?.map(line => line.text).join('\n'),
       updatedAt: new Date(entry.updated * 1000),
       createdAt: new Date(entry.created * 1000),
-      root: entry.title === this.root,
+      root: entry.title === this.rootTitle,
     }
   }
 
   async getEntries(): Promise<Entry[]> {
-    const entries: Scrapbox = await this.api.get('/').json()
+    const entries: Scrapbox = (await soxa.get(this.getApi('/'))).data
 
     return entries.pages.map(
       (entry): Entry => {
@@ -121,7 +121,7 @@ export default class ScrapboxEntryRepository extends EntryRepository {
           body: entry.descriptions.join('\n'),
           updatedAt: new Date(entry.updated * 1000),
           createdAt: new Date(entry.created * 1000),
-          root: entry.title === this.root,
+          root: entry.title === this.rootTitle,
         }
       },
     )

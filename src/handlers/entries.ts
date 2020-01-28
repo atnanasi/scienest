@@ -1,5 +1,7 @@
 import { convert } from '../utils/path.ts'
-import * as Entry from '../services/entry.ts'
+import EntryRepository from '../repositories/scrapbox/entry.ts'
+
+const Entry = new EntryRepository('rokoucha')
 
 export const getEntries = async ({ response }) => {
   response.body = await Entry.getEntries()

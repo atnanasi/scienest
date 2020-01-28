@@ -1,11 +1,13 @@
-import { getEntry } from '../services/entry.ts'
 import React from 'https://dev.jspm.io/react/index.js';
 import ReactDOMServer from 'https://dev.jspm.io/react-dom/server.js';
+import EntryRepository from '../repositories/scrapbox/entry.ts'
+
+const Entry = new EntryRepository('rokoucha')
 
 export default async ({params, response}) => {
   console.log(params.path)
   
-  const entry = await getEntry(
+  const entry = await Entry.getEntry(
     params.path ? `/${params.path}` : '/'
   )
 

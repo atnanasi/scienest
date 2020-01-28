@@ -1,9 +1,11 @@
-import { getEntries } from '../services/entry.ts'
 import React from 'https://dev.jspm.io/react/index.js';
 import ReactDOMServer from 'https://dev.jspm.io/react-dom/server.js';
+import EntryRepository from '../repositories/scrapbox/entry.ts'
+
+const Entry = new EntryRepository('rokoucha')
 
 export default async ({response}) => {
-  const entries = await getEntries()
+  const entries = await Entry.getEntries()
 
   response.body = ReactDOMServer.renderToString(
     <html lang='ja'>
