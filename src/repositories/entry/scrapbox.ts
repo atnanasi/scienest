@@ -1,5 +1,5 @@
 import { soxa } from 'https://deno.land/x/soxa/mod.ts'
-import EntryRepository, { Entry, NewEntry } from '../entry.ts'
+import EntryRepository, { Entry, NewEntry } from './index.ts'
 
 interface Scrapbox {
   projectName: string

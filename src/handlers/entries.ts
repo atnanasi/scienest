@@ -1,5 +1,5 @@
 import { convert } from '../utils/path.ts'
-import EntryRepository from '../repositories/scrapbox/entry.ts'
+import EntryRepository from '../repositories/entry/scrapbox.ts'
 
 const Entry = new EntryRepository('rokoucha')
 

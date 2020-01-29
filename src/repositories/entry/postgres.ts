@@ -1,5 +1,5 @@
 import { Client } from 'https://deno.land/x/postgres/mod.ts'
-import EntryRepository, { Entry, NewEntry } from '../entry.ts'
+import EntryRepository, { Entry, NewEntry } from './index.ts'
 
 export default class PostgresEntryRepository extends EntryRepository {
   private client: Client
