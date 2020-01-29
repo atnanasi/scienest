@@ -5,8 +5,6 @@ import EntryRepository from '../repositories/entry/scrapbox.ts'
 const Entry = new EntryRepository('rokoucha')
 
 export default async ({params, response}) => {
-  console.log(params.path)
-  
   const entry = await Entry.getEntry(
     params.path ? `/${params.path}` : '/'
   )

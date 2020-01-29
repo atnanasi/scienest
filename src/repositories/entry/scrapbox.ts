@@ -1,72 +1,74 @@
 import { soxa } from 'https://deno.land/x/soxa/mod.ts'
+import $ from 'https://cdn.jsdelivr.net/gh/rokoucha/transform-ts@master/mod.ts'
+import { $unixtime } from '../../utils/transformers.ts'
 import EntryRepository, { Entry, NewEntry } from './index.ts'
 
-interface Scrapbox {
-  projectName: string
-  skip: number
-  limit: number
-  count: number
-  pages: Page[]
-}
+const Icons = $.obj({
+  rokoucha: $.number,
+})
 
-interface Page {
-  id: string
-  title: string
-  image: null | string
-  descriptions: string[]
-  user: User
-  pin: number
-  views: number
-  linked: number
-  commitId?: string
-  created: number
-  updated: number
-  accessed: number
-  snapshotCreated: number | null
-  persistent?: boolean
-  lines?: Line[]
-  links?: string[]
-  icons?: Icons
-  relatedPages?: RelatedPages
-  collaborators?: any[]
-  lastAccessed?: number
-}
+const Line = $.obj({
+  id: $.string,
+  text: $.string,
+  userId: $.string,
+  created: $unixtime,
+  updated: $unixtime,
+})
 
-interface Icons {
-  rokoucha: number
-}
+const LinksHop = $.obj({
+  id: $.string,
+  title: $.string,
+  titleLc: $.string,
+  image: $.nullable($.string),
+  descriptions: $.array($.string),
+  linksLc: $.array($.string),
+  updated: $unixtime,
+  accessed: $unixtime,
+})
 
-interface Line {
-  id: string
-  text: string
-  userId: string
-  created: number
-  updated: number
-}
+const RelatedPages = $.obj({
+  links1hop: $.array(LinksHop),
+  links2hop: $.array(LinksHop),
+  icons1hop: $.array($.any),
+})
 
-interface RelatedPages {
-  links1hop: LinksHop[]
-  links2hop: LinksHop[]
-  icons1hop: any[]
-}
+const User = $.obj({
+  id: $.string,
+  name: $.optional($.string),
+  displayName: $.optional($.string),
+  photo: $.optional($.string),
+})
 
-interface LinksHop {
-  id: string
-  title: string
-  titleLc: string
-  image: null | string
-  descriptions: string[]
-  linksLc: string[]
-  updated: number
-  accessed: number
-}
+const Page = $.obj({
+  id: $.string,
+  title: $.string,
+  image: $.nullable($.string),
+  descriptions: $.array($.string),
+  user: User,
+  pin: $.number,
+  views: $.number,
+  linked: $.number,
+  commitId: $.optional($.string),
+  created: $unixtime,
+  updated: $unixtime,
+  accessed: $unixtime,
+  snapshotCreated: $.nullable($.number),
+  persistent: $.optional($.boolean),
+  lines: $.optional($.array(Line)),
+  links: $.optional($.array($.string)),
+  icons: $.optional(Icons),
+  relatedPages: $.optional(RelatedPages),
+  collaborators: $.optional($.array($.any)),
+  lastAccessed: $.optional($.number),
+})
 
-interface User {
-  id: string
-  name: string
-  displayName: string
-  photo: string
-}
+const Scrapbox = $.obj({
+  projectName: $.string,
+  skip: $.number,
+  limit: $.number,
+  count: $.number,
+  pages: $.array(Page),
+})
 
 export default class ScrapboxEntryRepository extends EntryRepository {
   private endpoint: URL
@@ -99,28 +101,31 @@ export default class ScrapboxEntryRepository extends EntryRepository {
   }
 
   async getEntry(path: string): Promise<Entry> {
-    const entry: Page = (await soxa.get(this.getApi(`/${this.toTitle(path)}`)))
-      .data
+    const entry = Page.transformOrThrow(
+      (await soxa.get(this.getApi(`/${this.toTitle(path)}`))).data,
+    )
 
     return {
       path: this.toPath(entry.title),
       body: entry.lines?.map(line => line.text).join('\n'),
-      updatedAt: new Date(entry.updated * 1000),
-      createdAt: new Date(entry.created * 1000),
+      updatedAt: entry.updated,
+      createdAt: entry.created,
       root: entry.title === this.rootTitle,
     }
   }
 
   async getEntries(): Promise<Entry[]> {
-    const entries: Scrapbox = (await soxa.get(this.getApi('/'))).data
+    const entries = Scrapbox.transformOrThrow(
+      (await soxa.get(this.getApi('/'))).data,
+    )
 
     return entries.pages.map(
       (entry): Entry => {
         return {
           path: this.toPath(entry.title),
           body: entry.descriptions.join('\n'),
-          updatedAt: new Date(entry.updated * 1000),
-          createdAt: new Date(entry.created * 1000),
+          updatedAt: entry.updated,
+          createdAt: entry.created,
           root: entry.title === this.rootTitle,
         }
       },
