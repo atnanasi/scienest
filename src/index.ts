@@ -6,7 +6,8 @@ import log from './utils/logger.ts'
 import requestLogger from './middleware/requestLogger.ts'
 import responseTime from './middleware/responseTime.ts'
 import view from './routers/view.ts'
-;(async () => {
+
+async function main() {
   const app = new Application()
 
   app.use(requestLogger)
@@ -24,4 +25,6 @@ import view from './routers/view.ts'
 
   log.info(`Closing database connection`)
   await client.end()
-})()
+}
+
+main()
