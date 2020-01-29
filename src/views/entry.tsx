@@ -1,6 +1,6 @@
 import React from 'https://dev.jspm.io/react/index.js';
 import ReactDOMServer from 'https://dev.jspm.io/react-dom/server.js';
-import EntryRepository from '../repositories/entry/scarpbox.ts'
+import EntryRepository from '../repositories/entry/scrapbox.ts'
 
 const Entry = new EntryRepository('rokoucha')
 

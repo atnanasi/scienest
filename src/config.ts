@@ -1,13 +1,19 @@
-const env = Deno.env()
+import $ from 'https://cdn.jsdelivr.net/gh/rokoucha/transform-ts@master/mod.ts'
+import { $numericString } from './utils/transformers.ts'
 
 // Application
-export const APP_HOST = env.APP_HOST || '127.0.0.1'
-export const APP_LOGGING = env.APP_LOGGING || 'debug'
-export const APP_PORT = env.APP_PORT || '4000'
+export const { APP_ENV, APP_HOST, APP_PORT } = $.obj({
+  APP_ENV: $.literal('production', 'development'),
+  APP_HOST: $.string,
+  APP_PORT: $numericString,
+}).transformOrThrow(Deno.env())
+export const APP_LOGGING = APP_ENV === 'development' ? 'debug' : 'info'
 
 // Database
-export const DB_HOST = env.DB_HOST || '127.0.0.1'
-export const DB_NAME = env.DB_NAME || 'scienest'
-export const DB_PASSWORD = env.DB_PASSWORD || 'scienest'
-export const DB_PORT = env.DB_PORT || '5432'
-export const DB_USERNAME = env.DB_USERNAME || 'scienest'
+export const { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USERNAME } = $.obj({
+  DB_HOST: $.string,
+  DB_NAME: $.string,
+  DB_PASSWORD: $.string,
+  DB_PORT: $numericString,
+  DB_USERNAME: $.string,
+}).transformOrThrow(Deno.env())
