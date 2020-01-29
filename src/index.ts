@@ -1,7 +1,7 @@
 import { APP_HOST, APP_PORT } from './config.ts'
 import { Application } from 'https://deno.land/x/oak/mod.ts'
 import api from './routers/api.ts'
-import client from './database.ts'
+import client from './database/client.ts'
 import log from './utils/logger.ts'
 import requestLogger from './middleware/requestLogger.ts'
 import responseTime from './middleware/responseTime.ts'

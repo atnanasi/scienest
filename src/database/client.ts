@@ -5,7 +5,7 @@ import {
   DB_USERNAME,
   DB_PASSWORD,
   DB_NAME,
-} from './config.ts'
+} from '../config.ts'
 
 const client = new Client({
   host: DB_HOST,
