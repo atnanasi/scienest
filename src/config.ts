@@ -10,9 +10,15 @@ export const { APP_ENV, APP_HOST, APP_PORT } = $.obj({
 export const APP_LOGGING = APP_ENV === 'development' ? 'debug' : 'info'
 
 // Database
-export const { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USERNAME } = $.obj({
+export const {
+  DB_HOST,
+  DB_DATABASE,
+  DB_PASSWORD,
+  DB_PORT,
+  DB_USERNAME,
+} = $.obj({
+  DB_DATABASE: $.string,
   DB_HOST: $.string,
-  DB_NAME: $.string,
   DB_PASSWORD: $.string,
   DB_PORT: $numericString,
   DB_USERNAME: $.string,
