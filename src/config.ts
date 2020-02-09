@@ -23,3 +23,8 @@ export const {
   DB_PORT: $numericString,
   DB_USERNAME: $.string,
 }).transformOrThrow(Deno.env())
+
+// Scrapbox
+export const { SCRAPBOX_API } = $.obj({
+  SCRAPBOX_API: $.string,
+}).transformOrThrow(Deno.env())

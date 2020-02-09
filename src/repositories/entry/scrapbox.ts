@@ -1,7 +1,8 @@
-import { soxa } from 'https://deno.land/x/soxa/mod.ts'
+import { soxa } from 'https://deno.land/x/soxa@v0.3/mod.ts'
 import $ from 'https://cdn.jsdelivr.net/gh/rokoucha/transform-ts@master/mod.ts'
 import { $unixtime } from '../../utils/transformers.ts'
 import EntryRepository, { Entry, NewEntry } from './index.ts'
+import { SCRAPBOX_API } from '../../config.ts'
 
 const Icons = $.obj({
   rokoucha: $.number,
@@ -77,8 +78,8 @@ export default class ScrapboxEntryRepository extends EntryRepository {
 
   constructor(
     projectName: string,
+    endpoint = SCRAPBOX_API,
     rootTitle = 'Home',
-    endpoint = 'https://scrapbox.io/',
   ) {
     super()
 
@@ -88,8 +89,8 @@ export default class ScrapboxEntryRepository extends EntryRepository {
   }
 
   private getApi(path: string): string {
-    const absolutePath = path.startsWith('/') ? path : `/${path}`
-    return `${this.endpoint.href}api/pages/${this.projectName}${absolutePath}`
+    const pageName = path.startsWith('/') ? path.slice(1) : path
+    return `${this.endpoint.href}/api/pages/${this.projectName}/${pageName}`
   }
 
   private toPath(title: string): string {
