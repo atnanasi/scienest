@@ -1,20 +1,33 @@
 export interface Entry {
-  path: string
-  body: string
-  updatedAt: Date
+  body: {
+    html: string
+    plain: string
+  }
   createdAt: Date
+  path: string
   root: boolean
+  scope: 'public' | 'unlisted' | 'private'
+  updatedAt: Date
 }
 
 export interface NewEntry {
-  path: string
-  body: string
+  body: Entry['body']['plain']
+  path: Entry['path']
+  scope: Entry['scope']
+}
+
+export interface GetEntryOptions {
+  scope?: Entry['scope']
 }
 
 export default abstract class EntryRepository {
-  abstract async getEntry(path: string): Promise<Entry>
-  abstract async getEntries(): Promise<Entry[]>
   abstract async createEntry(entry: NewEntry): Promise<string>
-  abstract async updateEntry(path: string, entry: Entry): Promise<string>
   abstract async deleteEntry(path: string): Promise<void>
+  abstract async getEntries(options?: GetEntryOptions): Promise<Entry[]>
+  abstract async getEntry(
+    path: string,
+    options?: GetEntryOptions,
+  ): Promise<Entry>
+  abstract async updateEntry(path: string, entry: Entry): Promise<string>
+  abstract get name(): string
 }

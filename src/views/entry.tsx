@@ -1,13 +1,11 @@
-import React from 'https://dev.jspm.io/react/index.js';
-import ReactDOMServer from 'https://dev.jspm.io/react-dom/server.js';
-import EntryRepository from '../repositories/entry/scrapbox.ts'
+import { convert } from '../utils/path.ts'
+import { RouterMiddleware } from 'https://deno.land/x/oak/mod.ts'
+import EntryModel from '../models/entry.ts'
+import React from 'https://dev.jspm.io/react/index.js'
+import ReactDOMServer from 'https://dev.jspm.io/react-dom/server.js'
 
-const Entry = new EntryRepository('rokoucha')
-
-export default async ({params, response}) => {
-  const entry = await Entry.getEntry(
-    params.path ? `/${params.path}` : '/'
-  )
+export default (entryModel: EntryModel): RouterMiddleware => async ({params, response}) => {
+  const entry = await entryModel.getEntry(convert(params.path))
 
   response.body = ReactDOMServer.renderToString(
     <html lang='ja'>
@@ -17,7 +15,7 @@ export default async ({params, response}) => {
       </head>
       <body>
         <h1>{entry.path}</h1>
-        <p>{entry.body}</p>
+        <p>{entry.body.html}</p>
       </body>
     </html>
   )

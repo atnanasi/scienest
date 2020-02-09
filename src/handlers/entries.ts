@@ -1,26 +1,37 @@
 import { convert } from '../utils/path.ts'
-import EntryRepository from '../repositories/entry/scrapbox.ts'
+import { RouterMiddleware } from 'https://deno.land/x/oak/mod.ts'
+import Entry from '../models/entry.ts'
 
-const Entry = new EntryRepository('rokoucha')
-
-export const getEntries = async ({ response }) => {
-  response.body = await Entry.getEntries()
+export const getEntries = (entry: Entry): RouterMiddleware => async ({
+  response,
+}) => {
+  response.body = await entry.getEntries()
 }
 
-export const getEntry = async ({ params, response }) => {
-  response.body = await Entry.getEntry(convert(params.path))
+export const getEntry = (entry: Entry): RouterMiddleware => async ({
+  params,
+  response,
+}) => {
+  response.body = await entry.getEntry(convert(params.path))
 }
 
-export const createEntry = async ({ request, response }) => {
+export const createEntry = (entry: Entry): RouterMiddleware => async ({
+  request,
+  response,
+}) => {
   const body = await request.body()
-  response.body = await Entry.createEntry(body.value)
+  response.body = await entry.createEntry(body.value)
 }
 
-export const updateEntry = async ({ params, request, response }) => {
+export const updateEntry = (entry: Entry): RouterMiddleware => async ({
+  params,
+  request,
+  response,
+}) => {
   const body = await request.body()
-  await Entry.updateEntry(convert(params.path), body.value)
+  await entry.updateEntry(convert(params.path), body.value)
 
-  response.body = await Entry.getEntry(body.value.path)
+  response.body = await entry.getEntry(body.value.path)
   response.headers.set(
     'Location',
     `http://localhost:4000/api/entries${body.value.path}`,
@@ -28,7 +39,10 @@ export const updateEntry = async ({ params, request, response }) => {
   response.status = 201
 }
 
-export const deleteEntry = async ({ params, response }) => {
-  response.body = await Entry.deleteEntry(convert(params.path))
+export const deleteEntry = (entry: Entry): RouterMiddleware => async ({
+  params,
+  response,
+}) => {
+  response.body = await entry.deleteEntry(convert(params.path))
   response.status = 204
 }

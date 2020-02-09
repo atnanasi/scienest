@@ -2,10 +2,9 @@ import { soxa } from 'https://deno.land/x/soxa@v0.3/mod.ts'
 import $ from 'https://cdn.jsdelivr.net/gh/rokoucha/transform-ts@master/mod.ts'
 import { $unixtime } from '../../utils/transformers.ts'
 import EntryRepository, { Entry, NewEntry } from './index.ts'
-import { SCRAPBOX_API } from '../../config.ts'
 
 const Icons = $.obj({
-  rokoucha: $.number,
+  rokoucha: $.optional($.number),
 })
 
 const Line = $.obj({
@@ -75,17 +74,24 @@ export default class ScrapboxEntryRepository extends EntryRepository {
   private endpoint: URL
   private projectName: string
   private rootTitle: string
+  private scope: Entry['scope']
 
-  constructor(
-    projectName: string,
-    endpoint = SCRAPBOX_API,
-    rootTitle = 'Home',
-  ) {
+  constructor(options: {
+    projectName: string
+    endpoint: string
+    rootTitle: string
+    scope: Entry['scope']
+  }) {
     super()
 
-    this.endpoint = new URL(endpoint)
-    this.projectName = projectName
-    this.rootTitle = rootTitle
+    this.endpoint = new URL(options.endpoint)
+    this.projectName = options.projectName
+    this.rootTitle = options.rootTitle
+    this.scope = options.scope
+  }
+
+  get name() {
+    return 'Scrapbox'
   }
 
   private getApi(path: string): string {
@@ -106,13 +112,19 @@ export default class ScrapboxEntryRepository extends EntryRepository {
       (await soxa.get(this.getApi(`/${this.toTitle(path)}`))).data,
     )
 
-    return {
-      path: this.toPath(entry.title),
-      body: entry.lines?.map(line => line.text).join('\n'),
-      updatedAt: entry.updated,
+    const entryObject: Entry = {
+      body: {
+        html: '',
+        plain: entry.lines?.map(line => line.text).join('\n'),
+      },
       createdAt: entry.created,
+      path: this.toPath(entry.title),
       root: entry.title === this.rootTitle,
+      scope: this.scope,
+      updatedAt: entry.updated,
     }
+    entryObject.body.html = entryObject.body.plain
+    return entryObject
   }
 
   async getEntries(): Promise<Entry[]> {
@@ -122,13 +134,19 @@ export default class ScrapboxEntryRepository extends EntryRepository {
 
     return entries.pages.map(
       (entry): Entry => {
-        return {
-          path: this.toPath(entry.title),
-          body: entry.descriptions.join('\n'),
-          updatedAt: entry.updated,
+        const entryObject: Entry = {
+          body: {
+            html: '',
+            plain: entry.descriptions.join('\n'),
+          },
           createdAt: entry.created,
+          path: this.toPath(entry.title),
           root: entry.title === this.rootTitle,
+          scope: this.scope,
+          updatedAt: entry.updated,
         }
+        entryObject.body.html = entryObject.body.plain
+        return entryObject
       },
     )
   }
