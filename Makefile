@@ -12,7 +12,7 @@ export $(shell sed 's/=.*//' .env)
 
 ARG := help
 DENO := /usr/bin/env deno
-DENOMIG := $(DENO) --allow-env --allow-read --allow-net https://cdn.jsdelivr.net/gh/rokoucha/denomig@master/denomig.ts --path=./src/database/migrations
+DENOMIG := $(DENO) --allow-env --allow-read --allow-net https://cdn.jsdelivr.net/gh/rokoucha/denomig@master/denomig.ts
 FIND := /usr/bin/env find
 
 ##@ Deno tasks
@@ -28,7 +28,7 @@ format: ## Format codes
 	@$(FIND) ./src -type f -name "*.ts" -exec $(DENO) fmt {} +;
 
 migration: ## Migration with denomig
-	@$(DENOMIG) ${ARG}
+	@$(DENOMIG) --path=./src/database/postgres/migrations ${ARG}
 
 ##@ Makefile tasks
 .PHONY: banner help
