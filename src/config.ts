@@ -25,6 +25,8 @@ export const {
 }).transformOrThrow(Deno.env())
 
 // Scrapbox
-export const { SCRAPBOX_API } = $.obj({
+export const { SCRAPBOX_API, SCRAPBOX_ENABLED, SCRAPBOX_PROJECT } = $.obj({
   SCRAPBOX_API: $.string,
+  SCRAPBOX_ENABLED: $.literal('true', 'false'),
+  SCRAPBOX_PROJECT: $.string,
 }).transformOrThrow(Deno.env())
