@@ -1,4 +1,4 @@
-import { APP_HOST, APP_PORT } from './config.ts'
+import { APP_HOST, APP_PORT, APP_ENV } from './config.ts'
 import { Application } from 'https://deno.land/x/oak/mod.ts'
 import api from './routers/api.ts'
 import client from './database/client.ts'
@@ -8,6 +8,13 @@ import responseTime from './middleware/responseTime.ts'
 import view from './routers/view.ts'
 
 async function main() {
+  if (APP_ENV === 'development') {
+    log.warning('development mode!')
+  }
+
+  log.info('Connecting to database')
+  await client.connect()
+
   const app = new Application()
 
   app.use(requestLogger)
@@ -16,9 +23,6 @@ async function main() {
   app.use(api.allowedMethods())
   app.use(view.routes())
   app.use(view.allowedMethods())
-
-  log.info('Connecting to database')
-  await client.connect()
 
   log.info(`Listenig on ${APP_HOST}:${APP_PORT}`)
   await app.listen(`${APP_HOST}:${APP_PORT}`)
