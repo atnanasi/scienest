@@ -1,12 +1,11 @@
 import { convert } from '../utils/path.ts'
 import { RouterMiddleware } from 'https://deno.land/x/oak/mod.ts'
-import EntryModel from '../models/entry.ts'
-import EntryRepository from '../repositories/entry/scrapbox.ts'
+import Article from '../models/article.ts'
 import React from 'https://dev.jspm.io/react/index.js'
 import ReactDOMServer from 'https://dev.jspm.io/react-dom/server.js'
 
-export default (entryModel: EntryModel): RouterMiddleware => async ({response}) => {
-  const entries = await entryModel.getEntries()
+export default (articleModel: Article): RouterMiddleware => async ({response}) => {
+  const articles = await articleModel.list()
 
   response.body = ReactDOMServer.renderToString(
     <html lang='ja'>
@@ -16,8 +15,8 @@ export default (entryModel: EntryModel): RouterMiddleware => async ({response}) 
       </head>
       <body>
         <ul>
-          {entries.map(entry => (
-            <li key={entry.path}>{entry.path} - {entry.body.html}</li>
+          {articles.map(article => (
+            <li key={article.path}>{article.path} - {article.body.html}</li>
           ))}
         </ul>
       </body>

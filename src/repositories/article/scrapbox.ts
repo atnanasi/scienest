@@ -1,7 +1,7 @@
 import { soxa } from 'https://deno.land/x/soxa@v0.3/mod.ts'
 import $ from 'https://cdn.jsdelivr.net/gh/rokoucha/transform-ts@master/mod.ts'
 import { $unixtime } from '../../utils/transformers.ts'
-import EntryRepository, { Entry, NewEntry } from './index.ts'
+import ArticleRepository, { Article, NewArticle } from './index.ts'
 
 const Icons = $.obj({
   rokoucha: $.optional($.number),
@@ -70,17 +70,17 @@ const Scrapbox = $.obj({
   pages: $.array(Page),
 })
 
-export default class ScrapboxEntryRepository extends EntryRepository {
+export default class ScrapboxArticleRepository extends ArticleRepository {
   private endpoint: URL
   private projectName: string
   private rootTitle: string
-  private scope: Entry['scope']
+  private scope: Article['scope']
 
   constructor(options: {
     projectName: string
     endpoint: string
     rootTitle: string
-    scope: Entry['scope']
+    scope: Article['scope']
   }) {
     super()
 
@@ -107,57 +107,60 @@ export default class ScrapboxEntryRepository extends EntryRepository {
     return path === '/' ? this.rootTitle : encodeURIComponent(path.substring(1))
   }
 
-  async getEntry(path: string): Promise<Entry> {
-    const entry = Page.transformOrThrow(
+  async get(path: string): Promise<Article> {
+    const article = Page.transformOrThrow(
       (await soxa.get(this.getApi(`/${this.toTitle(path)}`))).data,
     )
 
-    const entryObject: Entry = {
+    const articleObject: Article = {
       body: {
         html: '',
-        plain: entry.lines?.map(line => line.text).join('\n'),
+        plain: article.lines?.map(line => line.text).join('\n'),
       },
-      createdAt: entry.created,
-      path: this.toPath(entry.title),
-      root: entry.title === this.rootTitle,
+      createdAt: article.created,
+      path: this.toPath(article.title),
+      root: article.title === this.rootTitle,
       scope: this.scope,
-      updatedAt: entry.updated,
+      updatedAt: article.updated,
     }
-    entryObject.body.html = entryObject.body.plain
-    return entryObject
+    articleObject.body.html = articleObject.body.plain
+    return articleObject
   }
 
-  async getEntries(): Promise<Entry[]> {
-    const entries = Scrapbox.transformOrThrow(
+  async list(): Promise<Article[]> {
+    const articles = Scrapbox.transformOrThrow(
       (await soxa.get(this.getApi('/'))).data,
     )
 
-    return entries.pages.map(
-      (entry): Entry => {
-        const entryObject: Entry = {
+    return articles.pages.map(
+      (article): Article => {
+        const articleObject: Article = {
           body: {
             html: '',
-            plain: entry.descriptions.join('\n'),
+            plain: article.descriptions.join('\n'),
           },
-          createdAt: entry.created,
-          path: this.toPath(entry.title),
-          root: entry.title === this.rootTitle,
+          createdAt: article.created,
+          path: this.toPath(article.title),
+          root: article.title === this.rootTitle,
           scope: this.scope,
-          updatedAt: entry.updated,
+          updatedAt: article.updated,
         }
-        entryObject.body.html = entryObject.body.plain
-        return entryObject
+        articleObject.body.html = articleObject.body.plain
+        return articleObject
       },
     )
   }
 
-  async createEntry(entry: NewEntry): Promise<string> {
+  async create(entry: NewArticle): Promise<Article['path']> {
     return ''
   }
 
-  async updateEntry(path: string, entry: Entry): Promise<string> {
+  async update(
+    path: Article['path'],
+    entry: Article,
+  ): Promise<Article['path']> {
     return ''
   }
 
-  async deleteEntry(path: string): Promise<void> {}
+  async delete(path: Article['path']): Promise<void> {}
 }

@@ -48,3 +48,7 @@ export const $numericString = Transformer.from<string, string>(text =>
     ? error(ValidationError.from(new DoesNotNumericStringError(text)))
     : ok(text),
 )
+
+export const $booleanString = Transformer.from<'true' | 'false', boolean>(
+  text => ok(text === 'true'),
+)

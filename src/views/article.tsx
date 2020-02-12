@@ -1,11 +1,11 @@
 import { convert } from '../utils/path.ts'
 import { RouterMiddleware } from 'https://deno.land/x/oak/mod.ts'
-import EntryModel from '../models/entry.ts'
+import Article from '../models/article.ts'
 import React from 'https://dev.jspm.io/react/index.js'
 import ReactDOMServer from 'https://dev.jspm.io/react-dom/server.js'
 
-export default (entryModel: EntryModel): RouterMiddleware => async ({params, response}) => {
-  const entry = await entryModel.getEntry(convert(params.path))
+export default (articleModel: Article): RouterMiddleware => async ({params, response}) => {
+  const article = await articleModel.get(convert(params.path))
 
   response.body = ReactDOMServer.renderToString(
     <html lang='ja'>
@@ -14,8 +14,8 @@ export default (entryModel: EntryModel): RouterMiddleware => async ({params, res
         <title>Scienest</title>
       </head>
       <body>
-        <h1>{entry.path}</h1>
-        <p>{entry.body.html}</p>
+        <h1>{article.path}</h1>
+        <p>{article.body.html}</p>
       </body>
     </html>
   )

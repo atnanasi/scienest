@@ -1,17 +1,18 @@
 import { Application } from 'https://deno.land/x/oak/mod.ts'
 import { Router } from 'https://deno.land/x/oak/mod.ts'
 import * as config from './config.ts'
-import * as entryHandler from './handlers/entries.ts'
+import * as entryHandler from './handlers/articles.ts'
 import apiIndex from './handlers/index.ts'
+import Article from './models/article.ts'
+import ArticleRepository from './repositories/article/index.ts'
+import articleView from './views/article.tsx'
 import client from './database/postgres/client.ts'
-import Entry from './models/entry.ts'
-import entryView from './views/entry.tsx'
 import indexView from './views/index.tsx'
 import log from './utils/logger.ts'
-import PostgresEntryRepository from './repositories/entry/postgres.ts'
+import PostgresArticleRepository from './repositories/article/postgres.ts'
 import requestLogger from './middleware/requestLogger.ts'
 import responseTime from './middleware/responseTime.ts'
-import ScrapboxEntryRepository from './repositories/entry/scrapbox.ts'
+import ScrapboxArticleRepository from './repositories/article/scrapbox.ts'
 
 async function main() {
   if (config.APP_ENV === 'development') {
@@ -21,28 +22,33 @@ async function main() {
   log.info('Connecting to database')
   await client.connect()
 
-  const entry = new Entry([
-    new PostgresEntryRepository({ client }),
-    new ScrapboxEntryRepository({
-      endpoint: config.SCRAPBOX_API,
-      projectName: config.SCRAPBOX_PROJECT,
-      rootTitle: config.SCRAPBOX_ROOT,
-      scope: config.SCRAPBOX_SCOPE,
-    }),
-  ])
+  const repositories: ArticleRepository[] = [
+    new PostgresArticleRepository({ client }),
+  ]
+  if (config.SCRAPBOX_ENABLE)
+    repositories.push(
+      new ScrapboxArticleRepository({
+        endpoint: config.SCRAPBOX_API,
+        projectName: config.SCRAPBOX_PROJECT,
+        rootTitle: config.SCRAPBOX_ROOT,
+        scope: config.SCRAPBOX_SCOPE,
+      }),
+    )
+
+  const article = new Article(repositories)
 
   const router = new Router({ strict: true })
 
   router.get('/api', apiIndex)
-  router.get('/api/entries', entryHandler.getEntries(entry))
-  router.post('/api/entries', entryHandler.createEntry(entry))
-  router.get('/api/entries/', entryHandler.getEntry(entry))
-  router.get('/api/entries/:path', entryHandler.getEntry(entry))
-  router.put('/api/entries/:path', entryHandler.updateEntry(entry))
-  router.delete('/api/entries/:path', entryHandler.deleteEntry(entry))
-  router.get('/', indexView(entry))
-  router.get('/entries/', entryView(entry))
-  router.get('/entries/:path', entryView(entry))
+  router.get('/api/articles', entryHandler.list(article))
+  router.post('/api/articles', entryHandler.create(article))
+  router.get('/api/articles/', entryHandler.get(article))
+  router.get('/api/articles/:path', entryHandler.get(article))
+  router.put('/api/articles/:path', entryHandler.update(article))
+  router.delete('/api/articles/:path', entryHandler.deleteArticle(article))
+  router.get('/', indexView(article))
+  router.get('/articles/', articleView(article))
+  router.get('/articles/:path', articleView(article))
 
   const app = new Application()
 

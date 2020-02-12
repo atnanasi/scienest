@@ -1,5 +1,5 @@
 import $ from 'https://cdn.jsdelivr.net/gh/rokoucha/transform-ts@master/mod.ts'
-import { $numericString } from './utils/transformers.ts'
+import { $numericString, $booleanString } from './utils/transformers.ts'
 
 // Application
 export const { APP_DEFAULT_SCOPE, APP_ENV, APP_HOST, APP_PORT } = $.obj({
@@ -34,7 +34,7 @@ export const {
   SCRAPBOX_SCOPE,
 } = $.obj({
   SCRAPBOX_API: $.string,
-  SCRAPBOX_ENABLE: $.literal('true', 'false'),
+  SCRAPBOX_ENABLE: $booleanString,
   SCRAPBOX_PROJECT: $.string,
   SCRAPBOX_ROOT: $.string,
   SCRAPBOX_SCOPE: $.literal('public', 'unlisted', 'private'),
