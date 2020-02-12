@@ -7,9 +7,6 @@ define BANNER
 endef
 export BANNER
 
-include .env
-export $(shell sed 's/=.*//' .env)
-
 ARG := help
 DENO := /usr/bin/env deno
 DENOMIG := $(DENO) --allow-env --allow-read --allow-net https://cdn.jsdelivr.net/gh/rokoucha/denomig@master/denomig.ts
