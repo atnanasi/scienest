@@ -70,11 +70,23 @@ const Scrapbox = $.obj({
   pages: $.array(Page),
 })
 
+const Project = $.obj({
+  created:             $unixtime,
+  displayName:         $.string,
+  id:                  $.string,
+  image:               $.string,
+  name:                $.string,
+  publicVisible:       $.boolean,
+  updated:             $unixtime,
+})
+
 export default class ScrapboxArticleRepository extends ArticleRepository {
   private endpoint: URL
   private projectName: string
   private rootTitle: string
   private scope: Article['scope']
+  private cachedPages: Array<any>
+  private updatedAt: Date
 
   constructor(options: {
     projectName: string
@@ -88,15 +100,15 @@ export default class ScrapboxArticleRepository extends ArticleRepository {
     this.projectName = options.projectName
     this.rootTitle = options.rootTitle
     this.scope = options.scope
+    this.updatedAt = new Date(0)
   }
 
   get name() {
     return 'Scrapbox'
   }
 
-  private getApi(path: string): string {
-    const pageName = path.startsWith('/') ? path.slice(1) : path
-    return `${this.endpoint.href}/api/pages/${this.projectName}/${pageName}`
+  private getApi(mode: 'pages'|'projects', pageName = ''): string {
+    return `${this.endpoint.href}api/${mode}/${this.projectName}/${pageName}`
   }
 
   private toPath(title: string): string {
@@ -107,10 +119,44 @@ export default class ScrapboxArticleRepository extends ArticleRepository {
     return path === '/' ? this.rootTitle : encodeURIComponent(path.substring(1))
   }
 
-  async get(path: string): Promise<Article> {
-    const article = Page.transformOrThrow(
-      (await soxa.get(this.getApi(`/${this.toTitle(path)}`))).data,
+  private async getProject() {
+    return Project.transformOrThrow(
+      (await soxa.get(this.getApi('projects'))).data
     )
+  }
+
+  private async fetchPagesWithCache(pageName?: string) {
+    const project = await this.getProject()
+    
+    const isOldCache = this.updatedAt < project.updated
+
+    if(isOldCache) {
+      const pages = Scrapbox.transformOrThrow(
+        (await soxa.get(this.getApi('pages'))).data,
+      )
+
+      this.cachedPages = pages.pages
+
+      this.updatedAt = project.updated
+    }
+
+    if(pageName) {
+      const index = this.cachedPages.findIndex(cachedPage => cachedPage.title === pageName)
+
+      if(this.cachedPages[index].lines === undefined || isOldCache) {
+        this.cachedPages[index] = Page.transformOrThrow(
+          (await soxa.get(this.getApi('pages', pageName))).data,
+        )
+      }
+    }
+
+    return this.cachedPages
+  }
+
+  async get(path: string): Promise<Article> {
+    const articles = await this.fetchPagesWithCache(this.toTitle(path))
+
+    const article = articles.find(article => article.title === this.toTitle(path))
 
     const articleObject: Article = {
       body: {
@@ -128,11 +174,7 @@ export default class ScrapboxArticleRepository extends ArticleRepository {
   }
 
   async list(): Promise<Article[]> {
-    const articles = Scrapbox.transformOrThrow(
-      (await soxa.get(this.getApi('/'))).data,
-    )
-
-    return articles.pages.map(
+    return (await this.fetchPagesWithCache()).map(
       (article): Article => {
         const articleObject: Article = {
           body: {

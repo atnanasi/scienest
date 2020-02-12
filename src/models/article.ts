@@ -89,7 +89,6 @@ export default class ArticleModel {
     path: MultiBackendArticle['path'],
     args?: GetEntryOptions,
   ): Promise<MultiBackendArticle> {
-    console.log(path)
     const articles = await this.list(args)
     const foundArticle = articles.filter(article => article.path === path)[0]
 
